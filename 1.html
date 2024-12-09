@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<title>中国陶瓷博物馆</title>
+	</head>
+	<style>
+		body {
+
+			background-color: #435059;
+			font-family: 宋体, sans-serif;
+		}
+
+		.container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			margin-top: 50%;
+		}
+
+		.subtitlesData {
+			text-indent: 2em;
+			font-size: 30rpx;
+			width: 100%;
+			font-weight: 100;
+			line-height: 2;
+			color: #000000;
+		}
+
+		.voide-content {}
+
+		.voide-content video {}
+
+		.gif-container {
+			position: fixed;
+			width: 80px;
+			height: 200px;
+			z-index: 999;
+			bottom: 10px;
+			right: 20px;
+		}
+
+		.float-image {
+			width: 100px;
+			height: 180px;
+			position: absolute;
+			bottom: 0;
+			opacity: 1;
+		},
+		
+		.next-name{
+			color: #fff;
+		}
+	</style>
+	<body>
+		<div class="container">
+			<div class="voide-content">
+				<video id="myVideo" controls autoplay controlsList="nodownload noremoteplayback nofullscreen"></video>
+			</div>
+			<div style="display: none"><audio id="myAudio" width="320" height="240" controls></audio>
+			</div>
+			<div id="productName" style="text-align: center;margin-top: 10px;color: #fff;"></div>
+			<div id="toNext" style="text-align: center;margin-top: 100px;color: #fff;">点击前往下一个藏品</div>
+			<div id="dynamicData" style="color: white;" class="next-name"></div>
+			<div onclick="openDialog()" style="text-align: center;margin-top: 50px;color: #fff;">返回首页</div>
+			<div class="gif-container">
+				<img class="float-image" src="https://image.yuanqilian.com:4443/77d2eb11728f8ad83989a2d048ac4757"
+					alt="" />
+			</div>
+			<dialog id="myDialog" style="width: 300px; /* 适当增加宽度让内容展示更宽松 */
+height: 200px; /* 增加高度，使整体布局不那么紧凑 */
+background-color: #fff; 
+border: 1px solid #758c9c;
+background: linear-gradient(to bottom, #758c9c, #566f83); /* 使用渐变背景，增强视觉效果 */
+color: #fff;
+border-radius: 20px;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* 添加阴影，让对话框更立体 */">
+				<p style="text-align: center;
+    font-size: 25px;
+    margin-top: 30px; /* 增加顶部 margin，使文字垂直方向更居中 */
+    font-weight: bold; /* 加粗文字，使其更突出 */">退出精品路线</p>
+				<div style="display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 30px;">
+					<button id="closeDialog" style="width: 40%; /* 适当增加按钮宽度占比 */
+        height: 40px;
+        text-align: center;
+        font-size: 18px; /* 稍微减小字体大小，使其与整体更协调 */
+        background-color: #1a9833;
+        border-radius: 10px;
+        color: #fff;
+        border: 1px solid #1a9833;
+        cursor: pointer; /* 添加鼠标指针样式，提示可点击 */
+        transition: background-color 0.3s ease; /* 添加过渡效果，鼠标悬停时背景色变化更平滑 */">取消</button>
+					<button id="toHome" style="width: 40%; /* 适当增加按钮宽度占比 */
+        height: 40px;
+        text-align: center;
+        font-size: 18px; /* 稍微减小字体大小，使其与整体更协调 */
+        background-color: #32a2e4;
+        border-radius: 10px;
+        color: #fff;
+        border: 1px solid #32a2e4;
+        cursor: pointer; /* 添加鼠标指针样式，提示可点击 */
+        transition: background-color 0.3s ease; /* 添加过渡效果，鼠标悬停时背景色变化更平滑 */">确定</button>
+				</div>
+			</dialog>
+		</div>
+		<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+		<script type="text/javascript">
+			let poiId = '';
+			let array = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 24, 27, 30, 31, 32, 34, 37, 39, 40,
+				41, 42, 43, 45, 46, 49, 50, 52, 54, 57, 62, 64, 68, 72, 75, 76, 78, 82, 83, 85, 86, 89, 91, 95, 96, 100, 109,
+				111, 112, 114, 116, 117, 119, 124, 133, 134, 137, 138, 140, 141, 143, 144, 147, 149, 150, 151, 152, 155
+			];
+			let nextPoiId = '';
+			let StartPoiId = '';
+			// 定义动态数据
+			let data = '这是动态显示的数据';
+			// 获取要显示数据的元素
+			let element = document.getElementById('dynamicData');
+			// 将数据显示在元素中
+			element.innerHTML = data;
+			document.addEventListener('DOMContentLoaded', function() {
+				const urlParams = new URLSearchParams(window.location.search);
+				poiId = urlParams.get('poiId');
+				console.log(poiId)
+				if (poiId === null) {
+					poiId = 3;
+				}
+			});
+
+			function openDialog() {
+				var dialog = document.getElementById('myDialog');
+				dialog.showModal();
+			}
+
+			function closeDialog() {
+				var dialog = document.getElementById('myDialog');
+				dialog.close();
+			}
+
+			document.getElementById('closeDialog').addEventListener('click', function() {
+				var dialog = document.getElementById('myDialog');
+				dialog.close();
+			});
+
+			document.getElementById('toHome').addEventListener('click', function() {
+				wx.miniProgram.reLaunch({
+					url: '/projects/TRIP1/pages/home/home/index', // 指定跳转至小程序页面的路径
+					success: (res) => {
+						console.log(res); // 页面跳转成功的回调函数
+					},
+					fail: (err) => {
+						console.log(err); // 页面跳转失败的回调函数
+					}
+				});
+			});
+		</script>
+		<script>
+			function changeDynamicData(poiId) {
+				axios.get('https://sg.jdzcnc.com:3020/api/exhibits/letPoiidfindVoice', {
+						params: {
+							poiId: poiId+1,
+						}
+					})
+					.then(response => {
+						dynamicData.textContent = response.data.data.product_name;
+						console.log(dynamicData);
+						let index = array.indexOf(parseInt(poiId+1));
+						if (index !== -1 && index < array.length - 1) {
+							StartPoiId = array[index];
+							nextPoiId = array[index + 1];
+							console.log(nextPoiId);
+						} else {
+							console.log('poiId 不在数组中或者是数组的最后一个元素，没有后面一个值');
+					}
+					})
+					.catch(error => {
+						console.error('Error:', error);
+					});
+				console.log(dynamicData);
+			}
+			window.onload = function() {
+				changeDynamicData(poiId);
+				axios.get('https://sg.jdzcnc.com:3020/api/exhibits/letPoiidfindVoice', {
+						params: {
+							poiId: poiId,
+						}
+					})
+					.then(response => {
+						console.log("返回值为",response)
+						let index = array.indexOf(parseInt(poiId));
+						if (index !== -1 && index < array.length - 1) {
+							StartPoiId = array[index];
+							nextPoiId = array[index + 1];
+							console.log(nextPoiId);
+						} else {
+							console.log('poiId 不在数组中或者是数组的最后一个元素，没有后面一个值');
+						}
+						if (poiId == 155) {
+							const toNextDiv = document.getElementById('toNext');
+							toNextDiv.textContent = '精品路线到此结束';
+							toNextDiv.style.cursor = 'default'; // 可根据需求设置鼠标样式，这里设置为默认样式，表示不可点击
+							toNextDiv.removeEventListener('click', function() {
+								// 移除原有的点击事件处理函数，防止跳转
+								window.location.href =
+									`https://brtmap.com/bb/v4/c-h5v4/main/v4.0.0/index.html#/map?sign=f7be5d9542bb412994b84d276ed3f2c0&page=map&type=1&poiId=${nextPoiId}`;
+							});
+						} else {
+							document.getElementById('toNext').addEventListener('click', function() {
+								window.location.href =
+									`https://brtmap.com/bb/v4/c-h5v4/main/v4.0.0/index.html#/map?sign=f7be5d9542bb412994b84d276ed3f2c0&page=map&type=1&routeStartPoiId=${StartPoiId}&routeEndPoiId=${nextPoiId}`;
+							});
+						}
+
+						//console.log(response.data.data);
+						Data = {
+							//videoUrl: response.data.data.voice_description,
+							product_name: response.data.data.product_name,
+							image: response.data.data.image,
+							voice: response.data.data.cover_voice_url,
+							//subtitles: JSON.parse(response.data.data.captions),
+							voide: response.data.data.cover_voide_url,
+							//english_name: response.data.data.english_name,
+							//english_description: response.data.data.english_description
+						}
+						//console.log(Data.subtitles);
+						const productNameDiv = document.getElementById('productName');
+						productNameDiv.textContent = Data.product_name;
+
+						var video = document.getElementById('myVideo');
+						let screenWidth = window.innerWidth;
+						video.style.width = screenWidth + 'px';
+						video.style.height = screenWidth * 3 / 4 + 'px';
+						var source = video.querySelector('source');
+						if (!source) {
+							source = document.createElement('source');
+							video.appendChild(source);
+						}
+						source.src = Data.voide;
+						source.type = 'video/mp4';
+						// video.load();
+						video.autoplay = true;
+						source.autoplay = true;
+						video.addEventListener('timeupdate', function() {
+							var videoCurrentTime = video.currentTime;
+							//console.log('当前视频播放时间：', videoCurrentTime);
+
+							const subtitlesData = document.querySelector('.subtitlesData');
+							if (subtitlesData) {
+								// 清空之前的字幕内容
+								subtitlesData.innerHTML = '';
+
+								const subtitlesList = Data.subtitles.data;
+								subtitlesList.forEach((item, index) => {
+									let mainElement = '';
+									if (subtitlesList) {
+										if (videoCurrentTime * 1000 > item.start && videoCurrentTime *
+											1000 <= item.end) {
+											mainElement =
+												`<span style="color: red;">${item.text}</span>`;
+										} else {
+											mainElement = `<span>${item.text}</span>`;
+										}
+									} else {
+										console.error('未找到字幕数据');
+									}
+
+									const subtitlesItem = `${mainElement}`;
+
+									subtitlesData.innerHTML += subtitlesItem;
+								});
+							}
+						});
+
+						var audio = document.getElementById('myAudio');
+						var source = audio.querySelector('source');
+						if (!source) {
+							source = document.createElement('source');
+							audio.appendChild(source);
+						}
+						source.src = Data.voice;
+						source.type = 'audio/mp3';
+						audio.load();
+						audio.addEventListener('timeupdate', function() {
+							window.currentTime = audio.currentTime;
+							//console.log('当前音频播放时间：', window.currentTime);
+
+							const subtitlesData = document.querySelector('.subtitlesData');
+							if (subtitlesData) {
+								// 清空之前的字幕内容
+								subtitlesData.innerHTML = '';
+
+								const subtitlesList = Data.subtitles.data;
+								subtitlesList.forEach((item, index) => {
+									let mainElement = '';
+									if (subtitlesList) {
+										if (window.currentTime * 1000 > item.start && window
+											.currentTime * 1000 <= item.end) {
+											mainElement =
+												`<span style="color: red;">${item.text}</span>`;
+										} else {
+											mainElement = `<span>${item.text}</span>`;
+										}
+									} else {
+										console.error('未找到字幕数据');
+									}
+
+									const subtitlesItem = `${mainElement}`;
+
+									subtitlesData.innerHTML += subtitlesItem;
+								});
+							}
+						});
+					})
+					.catch(error => {
+						console.error('Error:', error);
+					});
+			}
+		</script>
+	</body>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</html>
